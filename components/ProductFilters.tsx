@@ -75,18 +75,21 @@ export default function ProductFilters() {
 
       {/* Max price */}
       <div>
-        <h4 className="font-semibold text-sm mb-2">Max Price (₹)</h4>
+        <h4 className="font-semibold text-sm mb-2">Max Price (AUD)</h4>
         <select
           value={maxPrice}
           onChange={(e) => setParam('maxPrice', e.target.value)}
           className="input"
         >
           <option value="">Any</option>
-          <option value="2000">Under ₹2,000</option>
-          <option value="5000">Under ₹5,000</option>
-          <option value="10000">Under ₹10,000</option>
-          <option value="20000">Under ₹20,000</option>
+          <option value="50">Under A$50</option>
+          <option value="100">Under A$100</option>
+          <option value="250">Under A$250</option>
+          <option value="500">Under A$500</option>
         </select>
+        <p className="text-[11px] text-gray-400 mt-1">
+          Filtered on AUD base price.
+        </p>
       </div>
 
       {/* Sort */}

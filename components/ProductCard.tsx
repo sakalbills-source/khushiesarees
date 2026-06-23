@@ -3,11 +3,14 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { Product } from '@/lib/types';
-import { formatINR } from '@/lib/format';
+import { firstImage } from '@/lib/placeholder';
 import { useCart } from './CartProvider';
+import { useCurrency } from './CurrencyProvider';
 
 export default function ProductCard({ product }: { product: Product }) {
   const { addItem } = useCart();
+  const { format } = useCurrency();
+  const cover = firstImage(product.images);
 
   function handleAdd(e: React.MouseEvent) {
     e.preventDefault();
@@ -16,7 +19,7 @@ export default function ProductCard({ product }: { product: Product }) {
       sku: product.sku,
       name: product.name,
       price: product.price,
-      image: product.images[0],
+      image: cover,
     });
   }
 
@@ -24,7 +27,7 @@ export default function ProductCard({ product }: { product: Product }) {
     <div className="group bg-white border border-gray-100 rounded-sm overflow-hidden hover:shadow-lg transition-shadow flex flex-col">
       <Link href={`/products/${product.sku}`} className="block relative aspect-[3/4] overflow-hidden bg-gray-100">
         <Image
-          src={product.images[0]}
+          src={cover}
           alt={product.name}
           fill
           sizes="(max-width: 768px) 50vw, 25vw"
@@ -47,7 +50,7 @@ export default function ProductCard({ product }: { product: Product }) {
           </h3>
         </Link>
         <p className="mt-2 font-serif text-lg font-semibold text-charcoal">
-          {formatINR(product.price)}
+          {format(product.price)}
         </p>
         <button
           onClick={handleAdd}

@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from 'react';
 import { Product, Category, CATEGORIES, FABRICS } from '@/lib/types';
-import { formatINR } from '@/lib/format';
+import { formatAUD } from '@/lib/format';
 
 const EMPTY: Partial<Product> = {
   name: '',
@@ -150,7 +150,7 @@ export default function AdminProductsPage() {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1">Price (₹)</label>
+            <label className="block text-sm font-medium mb-1">Price (AUD base)</label>
             <input
               type="number"
               className="input"
@@ -274,7 +274,7 @@ export default function AdminProductsPage() {
                 <td className="py-2 pr-4 font-mono text-xs">{p.sku}</td>
                 <td className="py-2 pr-4">{p.name}</td>
                 <td className="py-2 pr-4 capitalize">{p.category}</td>
-                <td className="py-2 pr-4">{formatINR(p.price)}</td>
+                <td className="py-2 pr-4">{formatAUD(p.price)}</td>
                 <td className="py-2 pr-4">
                   {p.in_stock ? (
                     <span className="text-green-700">In stock</span>
@@ -303,8 +303,9 @@ export default function AdminProductsPage() {
       </div>
 
       <p className="text-xs text-gray-400 mt-6">
-        Note: Add/edit/delete require a connected Supabase database. Without it, the
-        list shows seed data in read-only mode.
+        Note: Add/edit/delete require a connected Supabase database. Prices are
+        authored in AUD (the base currency); shoppers see them converted to their
+        selected currency. Without a database the catalogue is empty.
       </p>
     </div>
   );

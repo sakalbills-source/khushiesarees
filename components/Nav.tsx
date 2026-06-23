@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useCart } from './CartProvider';
+import CurrencySelector from './CurrencySelector';
 import { CATEGORIES } from '@/lib/types';
 
 const WHATSAPP_LINK = 'https://wa.me/910000000000'; // placeholder
@@ -28,7 +29,7 @@ export default function Nav() {
     <header className="sticky top-0 z-50 bg-charcoal text-white shadow-md">
       {/* Top bar */}
       <div className="bg-gold text-charcoal text-center text-xs py-1.5 font-medium">
-        ✦ Free worldwide shipping on orders over ₹15,000 ✦ Custom stitching available ✦
+        ✦ Worldwide shipping ✦ Prices shown in your chosen currency ✦ Custom stitching available ✦
       </div>
 
       <nav className="container-px flex items-center justify-between h-16">
@@ -58,6 +59,8 @@ export default function Nav() {
 
         {/* Icons */}
         <div className="flex items-center gap-4">
+          <CurrencySelector className="hidden sm:inline-flex" />
+
           <button
             aria-label="Search"
             onClick={() => setSearchOpen((s) => !s)}
@@ -121,6 +124,9 @@ export default function Nav() {
       {mobileOpen && (
         <div className="md:hidden border-t border-white/10 bg-charcoal">
           <ul className="container-px py-3 flex flex-col gap-3 text-sm">
+            <li className="sm:hidden pb-1">
+              <CurrencySelector />
+            </li>
             <li>
               <Link href="/products" onClick={() => setMobileOpen(false)}>
                 All Products

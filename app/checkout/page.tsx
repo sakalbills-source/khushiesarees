@@ -4,8 +4,8 @@ import { Suspense, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { useCart } from '@/components/CartProvider';
+import { useCurrency } from '@/components/CurrencyProvider';
 import { SHIPPING_REGIONS, getShippingRate } from '@/lib/shipping';
-import { formatINR } from '@/lib/format';
 
 function OrderConfirmation({ simulated }: { simulated: boolean }) {
   const { clear } = useCart();
@@ -36,13 +36,14 @@ function OrderConfirmation({ simulated }: { simulated: boolean }) {
 
 function CheckoutForm() {
   const { items, subtotal } = useCart();
+  const { currency, rate, format } = useCurrency();
   const [email, setEmail] = useState('');
-  const [country, setCountry] = useState('USA');
+  const [country, setCountry] = useState('AU');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const shipping = getShippingRate(country);
-  const total = subtotal + shipping;
+  const shipping = getShippingRate(country); // AUD base
+  const total = subtotal + shipping; // AUD base
 
   async function handlePay(e: React.FormEvent) {
     e.preventDefault();
@@ -52,7 +53,9 @@ function CheckoutForm() {
       const res = await fetch('/api/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, country, items }),
+        // Send AUD base amounts plus the EXACT currency + rate shown to the user.
+        // The server charges using this locked rate so charge == displayed.
+        body: JSON.stringify({ email, country, items, currency, rate }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Checkout failed');
@@ -105,7 +108,7 @@ function CheckoutForm() {
             >
               {SHIPPING_REGIONS.map((r) => (
                 <option key={r.code} value={r.code}>
-                  {r.label} — {formatINR(r.rate)}
+                  {r.label} — {format(r.rate)}
                 </option>
               ))}
             </select>
@@ -117,15 +120,22 @@ function CheckoutForm() {
           <div className="bg-gray-50 border border-gray-100 rounded-sm p-4 text-sm text-gray-600">
             <p className="font-medium text-charcoal mb-1">Payment</p>
             <p>
-              You&apos;ll be securely redirected to Stripe to complete your
-              payment. Card details are never stored on our servers.
+              You&apos;ll be securely redirected to Stripe to pay by card
+              (Visa &amp; Mastercard). Card details are never stored on our
+              servers.
+            </p>
+            <p className="mt-1.5 text-xs">
+              You will be charged{' '}
+              <span className="font-medium text-charcoal">{format(total)}</span>{' '}
+              ({currency}) — exactly the amount shown, at the rate locked when
+              you check out.
             </p>
           </div>
 
           {error && <p className="text-sm text-red-600">{error}</p>}
 
           <button type="submit" disabled={loading} className="btn-gold w-full">
-            {loading ? 'Processing…' : `Pay ${formatINR(total)}`}
+            {loading ? 'Processing…' : `Pay ${format(total)}`}
           </button>
         </form>
 
@@ -138,22 +148,22 @@ function CheckoutForm() {
                 <span className="text-gray-600">
                   {i.name} × {i.quantity}
                 </span>
-                <span>{formatINR(i.price * i.quantity)}</span>
+                <span>{format(i.price * i.quantity)}</span>
               </li>
             ))}
           </ul>
           <div className="border-t border-gray-200 pt-3 space-y-2 text-sm">
             <div className="flex justify-between">
               <span>Subtotal</span>
-              <span>{formatINR(subtotal)}</span>
+              <span>{format(subtotal)}</span>
             </div>
             <div className="flex justify-between">
               <span>Shipping</span>
-              <span>{formatINR(shipping)}</span>
+              <span>{format(shipping)}</span>
             </div>
             <div className="flex justify-between font-semibold text-base pt-2 border-t border-gray-200">
               <span>Total</span>
-              <span>{formatINR(total)}</span>
+              <span>{format(total)}</span>
             </div>
           </div>
         </aside>

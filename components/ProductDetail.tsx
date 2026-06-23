@@ -4,11 +4,14 @@ import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Product } from '@/lib/types';
-import { formatINR } from '@/lib/format';
+import { firstImage, PLACEHOLDER_IMAGE } from '@/lib/placeholder';
 import { useCart } from './CartProvider';
+import { useCurrency } from './CurrencyProvider';
 
 export default function ProductDetail({ product }: { product: Product }) {
   const { addItem } = useCart();
+  const { format } = useCurrency();
+  const images = product.images && product.images.length > 0 ? product.images : [];
   const [activeImg, setActiveImg] = useState(0);
   const [qty, setQty] = useState(1);
   const [showSizeGuide, setShowSizeGuide] = useState(false);
@@ -23,7 +26,7 @@ export default function ProductDetail({ product }: { product: Product }) {
         sku: product.sku,
         name: product.name,
         price: product.price,
-        image: product.images[0],
+        image: firstImage(product.images),
         customization: customize && customNote ? customNote : undefined,
       },
       qty,
@@ -45,7 +48,7 @@ export default function ProductDetail({ product }: { product: Product }) {
         <div>
           <div className="relative aspect-[3/4] bg-gray-100 rounded-sm overflow-hidden">
             <Image
-              src={product.images[activeImg]}
+              src={images[activeImg] ?? PLACEHOLDER_IMAGE}
               alt={product.name}
               fill
               sizes="(max-width: 768px) 100vw, 50vw"
@@ -53,9 +56,9 @@ export default function ProductDetail({ product }: { product: Product }) {
               priority
             />
           </div>
-          {product.images.length > 1 && (
+          {images.length > 1 && (
             <div className="flex gap-3 mt-3">
-              {product.images.map((img, i) => (
+              {images.map((img, i) => (
                 <button
                   key={i}
                   onClick={() => setActiveImg(i)}
@@ -77,7 +80,7 @@ export default function ProductDetail({ product }: { product: Product }) {
           </p>
           <h1 className="font-serif text-3xl text-charcoal mb-3">{product.name}</h1>
           <p className="font-serif text-2xl font-semibold text-charcoal mb-1">
-            {formatINR(product.price)}
+            {format(product.price)}
           </p>
           <p className="text-xs text-gray-500 mb-5">SKU: {product.sku}</p>
 

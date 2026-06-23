@@ -23,6 +23,12 @@ export default async function HomePage() {
     })),
   );
 
+  // Only show category sections that actually have products. When the whole
+  // catalogue is empty, render a single clean "Coming soon" block instead of a
+  // wall of empty sections.
+  const populated = sectionData.filter((s) => s.products.length > 0);
+  const catalogueEmpty = populated.length === 0;
+
   return (
     <>
       <Hero />
@@ -42,23 +48,40 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {sectionData.map((s) => (
-        <section key={s.category} className="container-px py-10">
-          <div className="flex items-end justify-between mb-6">
-            <div>
-              <h2 className="font-serif text-3xl text-charcoal">{s.title}</h2>
-              <p className="text-gray-500 text-sm mt-1">{s.subtitle}</p>
-            </div>
-            <Link
-              href={`/products?category=${s.category}`}
-              className="text-gold-dark text-sm font-medium hover:underline whitespace-nowrap"
-            >
-              View all →
-            </Link>
+      {catalogueEmpty ? (
+        <section className="container-px py-16">
+          <div className="text-center py-16 px-4 border border-dashed border-gray-200 rounded-sm bg-gray-50/50 max-w-2xl mx-auto">
+            <p className="text-gold-dark text-xs uppercase tracking-[0.3em] mb-3">
+              Coming soon
+            </p>
+            <h2 className="font-serif text-3xl text-charcoal mb-3">
+              Our new collection is on its way
+            </h2>
+            <p className="text-gray-500 max-w-md mx-auto">
+              We&apos;re curating something special. Join our list below to be the
+              first to know when the boutique opens.
+            </p>
           </div>
-          <ProductGrid products={s.products} />
         </section>
-      ))}
+      ) : (
+        populated.map((s) => (
+          <section key={s.category} className="container-px py-10">
+            <div className="flex items-end justify-between mb-6">
+              <div>
+                <h2 className="font-serif text-3xl text-charcoal">{s.title}</h2>
+                <p className="text-gray-500 text-sm mt-1">{s.subtitle}</p>
+              </div>
+              <Link
+                href={`/products?category=${s.category}`}
+                className="text-gold-dark text-sm font-medium hover:underline whitespace-nowrap"
+              >
+                View all →
+              </Link>
+            </div>
+            <ProductGrid products={s.products} />
+          </section>
+        ))
+      )}
 
       <Testimonials />
       <Newsletter />

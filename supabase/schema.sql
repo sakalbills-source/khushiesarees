@@ -25,8 +25,14 @@ create table if not exists orders (
   user_email text not null,
   shipping_country text not null,
   items jsonb not null default '[]',
-  total numeric not null default 0,
+  total numeric not null default 0,        -- canonical AUD base total (source of truth)
   status text not null default 'pending' check (status in ('pending','paid','shipped')),
+  -- Multi-currency: FX details locked at payment time (see orders_fx.sql for
+  -- the additive migration that backfills these onto an existing database).
+  currency text,                            -- charged currency code (e.g. USD)
+  amount_charged numeric,                   -- total charged in `currency`
+  fx_rate numeric,                          -- AUD -> currency rate applied
+  aud_total numeric,                        -- AUD base total (mirrors `total`)
   created_at timestamptz not null default now()
 );
 

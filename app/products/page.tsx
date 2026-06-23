@@ -45,6 +45,15 @@ export default async function ProductsPage({
 
   const totalPages = Math.ceil(total / PER_PAGE);
 
+  // Distinguish "no results for this filter/search" from "catalogue is empty".
+  const isFiltered = Boolean(
+    search || fabric || maxPrice || (category && category !== 'all'),
+  );
+  const emptyTitle = isFiltered ? 'No matches' : 'Coming soon';
+  const emptyText = isFiltered
+    ? 'No products match these filters. Try broadening your search.'
+    : 'Our catalogue is being prepared. Please check back shortly.';
+
   return (
     <div className="container-px py-10">
       <div className="mb-8">
@@ -62,7 +71,11 @@ export default async function ProductsPage({
         </aside>
 
         <div>
-          <ProductGrid products={products} />
+          <ProductGrid
+            products={products}
+            emptyTitle={emptyTitle}
+            emptyText={emptyText}
+          />
           <Suspense fallback={null}>
             <Pagination page={page} totalPages={totalPages} />
           </Suspense>

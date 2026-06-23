@@ -3,10 +3,12 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { useCart } from '@/components/CartProvider';
-import { formatINR } from '@/lib/format';
+import { useCurrency } from '@/components/CurrencyProvider';
+import { PLACEHOLDER_IMAGE } from '@/lib/placeholder';
 
 export default function CartPage() {
   const { items, subtotal, updateQty, removeItem, clear } = useCart();
+  const { format } = useCurrency();
 
   if (items.length === 0) {
     return (
@@ -39,7 +41,7 @@ export default function CartPage() {
                 className="relative w-24 h-32 shrink-0 bg-gray-100 rounded-sm overflow-hidden"
               >
                 <Image
-                  src={item.image}
+                  src={item.image || PLACEHOLDER_IMAGE}
                   alt={item.name}
                   fill
                   sizes="96px"
@@ -87,7 +89,7 @@ export default function CartPage() {
                     </button>
                   </div>
                   <span className="font-semibold">
-                    {formatINR(item.price * item.quantity)}
+                    {format(item.price * item.quantity)}
                   </span>
                 </div>
               </div>
@@ -107,7 +109,7 @@ export default function CartPage() {
           <h2 className="font-serif text-xl mb-4">Order Summary</h2>
           <div className="flex justify-between text-sm mb-2">
             <span>Subtotal</span>
-            <span className="font-medium">{formatINR(subtotal)}</span>
+            <span className="font-medium">{format(subtotal)}</span>
           </div>
           <div className="flex justify-between text-sm text-gray-500 mb-4">
             <span>Shipping</span>
@@ -115,7 +117,7 @@ export default function CartPage() {
           </div>
           <div className="border-t border-gray-200 pt-4 flex justify-between font-semibold">
             <span>Estimated Total</span>
-            <span>{formatINR(subtotal)}</span>
+            <span>{format(subtotal)}</span>
           </div>
           <Link href="/checkout" className="btn-gold w-full mt-6">
             Proceed to Checkout

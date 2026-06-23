@@ -5,7 +5,7 @@ export interface Product {
   name: string;
   sku: string;
   description: string;
-  price: number; // in INR (₹)
+  price: number; // AUD — the canonical base currency (see lib/currency.ts)
   images: string[];
   category: Category;
   fabric: string;

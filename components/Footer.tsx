@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { CATEGORIES } from '@/lib/types';
 import { SHIPPING_REGIONS } from '@/lib/shipping';
+import RatesNote from './RatesNote';
 
 export default function Footer() {
   return (
@@ -61,8 +62,11 @@ export default function Footer() {
         </div>
       </div>
 
-      <div className="border-t border-white/10 py-4 text-center text-xs text-gray-500">
-        © {new Date().getFullYear()} KSarees. All rights reserved. Built with Next.js.
+      <div className="border-t border-white/10 py-4 text-center text-xs text-gray-500 space-y-1.5">
+        <RatesNote />
+        <p>
+          © {new Date().getFullYear()} KSarees. All rights reserved. Built with Next.js.
+        </p>
       </div>
     </footer>
   );
