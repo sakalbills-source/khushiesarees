@@ -28,7 +28,7 @@ export default function ProductCard({ product }: { product: Product }) {
       <Link href={`/products/${product.sku}`} className="block relative aspect-[3/4] overflow-hidden bg-gray-100">
         <Image
           src={cover}
-          alt={product.name}
+          alt={`${product.name} — ${product.fabric} ${product.category} online, ships to Australia, NZ, Fiji, UK & USA`}
           fill
           sizes="(max-width: 768px) 50vw, 25vw"
           className="object-cover group-hover:scale-105 transition-transform duration-300"

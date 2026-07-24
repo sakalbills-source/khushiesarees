@@ -4,6 +4,8 @@ export default function Hero() {
   return (
     <section className="relative h-[60vh] min-h-[420px] flex items-center justify-center text-center text-white overflow-hidden">
       <div
+        role="img"
+        aria-label="Model wearing an elegant Indian saree from KSarees' festive collection"
         className="absolute inset-0 bg-cover bg-center"
         style={{
           backgroundImage:

@@ -29,3 +29,8 @@ next-env.d.ts
 
 # vercel
 .vercel
+
+# next-sitemap (generated on build)
+/public/sitemap.xml
+/public/sitemap-*.xml
+/public/robots.txt

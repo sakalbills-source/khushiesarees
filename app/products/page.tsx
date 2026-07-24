@@ -1,13 +1,35 @@
 import { Suspense } from 'react';
+import type { Metadata } from 'next';
 import ProductGrid from '@/components/ProductGrid';
 import ProductFilters from '@/components/ProductFilters';
 import Pagination from '@/components/Pagination';
 import { getProducts } from '@/lib/products';
 import { Category } from '@/lib/types';
+import { DEFAULT_OG_IMAGE } from '@/lib/seo';
 
 const PER_PAGE = 12;
 
-export const metadata = { title: 'Shop All — KSarees' };
+const TITLE = 'Shop Indian Sarees, Lehengas & Ethnic Wear Online';
+const DESCRIPTION =
+  'Browse Banarasi silk sarees, Kanjivaram sarees, bridal lehengas, salwar suits and kurtis. KSarees ships Indian ethnic wear to Australia, NZ, Fiji, the UK, USA and Europe.';
+
+export const metadata: Metadata = {
+  title: TITLE,
+  description: DESCRIPTION,
+  alternates: { canonical: '/products' },
+  openGraph: {
+    title: TITLE,
+    description: DESCRIPTION,
+    url: '/products',
+    images: [{ url: DEFAULT_OG_IMAGE, width: 1200, height: 630 }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: TITLE,
+    description: DESCRIPTION,
+    images: [DEFAULT_OG_IMAGE],
+  },
+};
 
 type SearchParams = { [key: string]: string | string[] | undefined };
 

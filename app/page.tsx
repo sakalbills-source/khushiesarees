@@ -1,10 +1,13 @@
 import Link from 'next/link';
+import type { Metadata } from 'next';
 import Hero from '@/components/Hero';
 import Newsletter from '@/components/Newsletter';
 import Testimonials from '@/components/Testimonials';
 import ProductGrid from '@/components/ProductGrid';
 import { getFeaturedByCategory } from '@/lib/products';
 import { Category } from '@/lib/types';
+import { DEFAULT_DESCRIPTION, DEFAULT_OG_IMAGE, DEFAULT_TITLE } from '@/lib/seo';
+import { organizationJsonLd, websiteJsonLd } from '@/lib/structured-data';
 
 const sections: { category: Category; title: string; subtitle: string }[] = [
   { category: 'saree', title: 'Sarees', subtitle: 'Silk, Banarasi, Georgette & more' },
@@ -14,6 +17,24 @@ const sections: { category: Category; title: string; subtitle: string }[] = [
 ];
 
 export const revalidate = 60;
+
+export const metadata: Metadata = {
+  title: DEFAULT_TITLE,
+  description: DEFAULT_DESCRIPTION,
+  alternates: { canonical: '/' },
+  openGraph: {
+    title: DEFAULT_TITLE,
+    description: DEFAULT_DESCRIPTION,
+    url: '/',
+    images: [{ url: DEFAULT_OG_IMAGE, width: 1200, height: 630 }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: DEFAULT_TITLE,
+    description: DEFAULT_DESCRIPTION,
+    images: [DEFAULT_OG_IMAGE],
+  },
+};
 
 export default async function HomePage() {
   const sectionData = await Promise.all(
@@ -31,6 +52,16 @@ export default async function HomePage() {
 
   return (
     <>
+      <script
+        type="application/ld+json"
+        // eslint-disable-next-line react/no-danger
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd()) }}
+      />
+      <script
+        type="application/ld+json"
+        // eslint-disable-next-line react/no-danger
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd()) }}
+      />
       <Hero />
 
       {/* Category quick links */}

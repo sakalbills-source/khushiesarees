@@ -49,7 +49,7 @@ export default function ProductDetail({ product }: { product: Product }) {
           <div className="relative aspect-[3/4] bg-gray-100 rounded-sm overflow-hidden">
             <Image
               src={images[activeImg] ?? PLACEHOLDER_IMAGE}
-              alt={product.name}
+              alt={`${product.name} — ${product.fabric} ${product.category}, buy online at KSarees`}
               fill
               sizes="(max-width: 768px) 100vw, 50vw"
               className="object-cover"
@@ -66,7 +66,13 @@ export default function ProductDetail({ product }: { product: Product }) {
                     i === activeImg ? 'border-gold' : 'border-transparent'
                   }`}
                 >
-                  <Image src={img} alt="" fill sizes="80px" className="object-cover" />
+                  <Image
+                    src={img}
+                    alt={`${product.name} thumbnail ${i + 1}`}
+                    fill
+                    sizes="80px"
+                    className="object-cover"
+                  />
                 </button>
               ))}
             </div>
