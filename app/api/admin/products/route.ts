@@ -3,9 +3,20 @@ import { getSupabaseAdmin } from '@/lib/supabase';
 import { getAllProductsAdmin } from '@/lib/products';
 import { Product } from '@/lib/types';
 
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'changeme';
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
 
+/**
+ * Fails closed: with no ADMIN_PASSWORD configured there is no correct password,
+ * so every admin request is refused rather than falling back to a shared
+ * default. Never reintroduce a literal fallback here — this endpoint can
+ * create, edit and delete live catalogue rows.
+ */
 function authorized(req: NextRequest): boolean {
+  if (!ADMIN_PASSWORD) {
+    throw new Error(
+      'ADMIN_PASSWORD is not set — refusing all admin requests. Set it in the deployment environment.',
+    );
+  }
   return req.headers.get('x-admin-password') === ADMIN_PASSWORD;
 }
 

@@ -99,10 +99,6 @@ export default function AdminProductsPageClient() {
           </button>
           {message && <p className="text-sm text-red-600 text-center">{message}</p>}
         </form>
-        <p className="text-xs text-gray-400 text-center mt-4">
-          Default password is <code>changeme</code> (set <code>ADMIN_PASSWORD</code> in
-          env).
-        </p>
       </div>
     );
   }

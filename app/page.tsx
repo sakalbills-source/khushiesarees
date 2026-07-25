@@ -2,7 +2,6 @@ import Link from 'next/link';
 import type { Metadata } from 'next';
 import Hero from '@/components/Hero';
 import Newsletter from '@/components/Newsletter';
-import Testimonials from '@/components/Testimonials';
 import ProductGrid from '@/components/ProductGrid';
 import { getFeaturedByCategory } from '@/lib/products';
 import { Category } from '@/lib/types';
@@ -114,7 +113,8 @@ export default async function HomePage() {
         ))
       )}
 
-      <Testimonials />
+      {/* Social proof intentionally omitted until real, attributable customer
+          reviews exist. Do not reinstate invented testimonials. */}
       <Newsletter />
     </>
   );

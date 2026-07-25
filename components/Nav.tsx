@@ -6,8 +6,7 @@ import { useState } from 'react';
 import { useCart } from './CartProvider';
 import CurrencySelector from './CurrencySelector';
 import { CATEGORIES } from '@/lib/types';
-
-const WHATSAPP_LINK = 'https://wa.me/910000000000'; // placeholder
+import { WHATSAPP_LINK } from '@/lib/contact';
 
 export default function Nav() {
   const { count } = useCart();
@@ -69,15 +68,17 @@ export default function Nav() {
             <SearchIcon />
           </button>
 
-          <a
-            href={WHATSAPP_LINK}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="WhatsApp"
-            className="hover:text-gold transition-colors"
-          >
-            <WhatsAppIcon />
-          </a>
+          {WHATSAPP_LINK && (
+            <a
+              href={WHATSAPP_LINK}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="WhatsApp"
+              className="hover:text-gold transition-colors"
+            >
+              <WhatsAppIcon />
+            </a>
+          )}
 
           <Link
             href="/cart"

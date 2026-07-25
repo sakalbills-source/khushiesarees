@@ -84,7 +84,8 @@ Copy `.env.local.example` → `.env.local`. All are optional for the demo shell.
 | `SUPABASE_SERVICE_ROLE_KEY`          | Server-only key (admin writes, orders)   |
 | `STRIPE_SECRET_KEY`                  | Stripe secret (test key OK)              |
 | `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | Stripe publishable key                   |
-| `ADMIN_PASSWORD`                     | Password for `/admin/products` (default `changeme`) |
+| `ADMIN_PASSWORD`                     | **Required.** Password for `/admin/products`. No default — the admin API refuses all requests when unset |
+| `NEXT_PUBLIC_WHATSAPP_NUMBER`        | Optional. WhatsApp support number, digits only. WhatsApp buttons are hidden when unset |
 | `NEXT_PUBLIC_SITE_URL`               | Base URL for Stripe redirects            |
 
 > Without Stripe keys, checkout runs in **demo mode** — it simulates a

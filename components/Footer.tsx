@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { CATEGORIES } from '@/lib/types';
 import { SHIPPING_REGIONS } from '@/lib/shipping';
+import { WHATSAPP_LINK } from '@/lib/contact';
 import RatesNote from './RatesNote';
 
 export default function Footer() {
@@ -43,19 +44,21 @@ export default function Footer() {
         <div>
           <h5 className="font-semibold text-white mb-3">Help</h5>
           <ul className="space-y-2">
-            <li>
-              <a href="https://wa.me/910000000000" className="hover:text-gold">
-                WhatsApp Support
-              </a>
-            </li>
+            {WHATSAPP_LINK && (
+              <li>
+                <a
+                  href={WHATSAPP_LINK}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-gold"
+                >
+                  WhatsApp Support
+                </a>
+              </li>
+            )}
             <li>
               <Link href="/cart" className="hover:text-gold">
                 Your Cart
-              </Link>
-            </li>
-            <li>
-              <Link href="/admin/products" className="hover:text-gold">
-                Admin
               </Link>
             </li>
           </ul>
