@@ -1,14 +1,15 @@
 import type { Metadata } from 'next';
-import CartPageClient from '@/components/CartPageClient';
+import { Suspense } from 'react';
+import CartView from '@/components/CartView';
 
-export const metadata: Metadata = {
-  title: 'Your Cart',
-  description:
-    'Review the sarees, lehengas and ethnic wear in your KSarees cart before checkout. Worldwide shipping to Australia, NZ, Fiji, UK, USA and the Caribbean.',
-  alternates: { canonical: '/cart' },
-  robots: { index: false, follow: true },
-};
+export const metadata: Metadata = { title: 'Your Bag', robots: { index: false, follow: false } };
 
 export default function CartPage() {
-  return <CartPageClient />;
+  return (
+    <div className="container-px pt-12">
+      <Suspense fallback={<div className="min-h-[40vh]" />}>
+        <CartView />
+      </Suspense>
+    </div>
+  );
 }

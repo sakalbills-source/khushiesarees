@@ -1,65 +1,44 @@
-'use client';
-
-import Link from 'next/link';
 import Image from 'next/image';
-import { Product } from '@/lib/types';
-import { firstImage } from '@/lib/placeholder';
-import { useCart } from './CartProvider';
-import { useCurrency } from './CurrencyProvider';
+import Link from 'next/link';
+import { CatalogProduct } from '@/lib/catalog';
+import { formatAUD } from '@/lib/format';
 
-export default function ProductCard({ product }: { product: Product }) {
-  const { addItem } = useCart();
-  const { format } = useCurrency();
-  const cover = firstImage(product.images);
-
-  function handleAdd(e: React.MouseEvent) {
-    e.preventDefault();
-    addItem({
-      product_id: product.id,
-      sku: product.sku,
-      name: product.name,
-      price: product.price,
-      image: cover,
-    });
-  }
-
+export default function ProductCard({
+  product,
+  available,
+  priority = false,
+  sizes = '(min-width: 1024px) 30vw, (min-width: 640px) 45vw, 90vw',
+}: {
+  product: CatalogProduct;
+  available: boolean;
+  priority?: boolean;
+  sizes?: string;
+}) {
+  const img = product.gallery[0];
   return (
-    <div className="group bg-white border border-gray-100 rounded-sm overflow-hidden hover:shadow-lg transition-shadow flex flex-col">
-      <Link href={`/products/${product.sku}`} className="block relative aspect-[3/4] overflow-hidden bg-gray-100">
+    <Link href={`/sarees/${product.slug}`} className="group block">
+      <div className="relative aspect-[3/4] overflow-hidden rounded-sm bg-cream-warm">
         <Image
-          src={cover}
-          alt={`${product.name} — ${product.fabric} ${product.category} online, ships to Australia, NZ, Fiji, UK & USA`}
+          src={img.src}
+          alt={img.alt}
           fill
-          sizes="(max-width: 768px) 50vw, 25vw"
-          className="object-cover group-hover:scale-105 transition-transform duration-300"
+          sizes={sizes}
+          priority={priority}
+          className="object-contain transition-transform duration-500 group-hover:scale-[1.02]"
         />
-        {!product.in_stock && (
-          <span className="absolute top-2 left-2 bg-charcoal/80 text-white text-[10px] px-2 py-1 rounded-sm">
-            Out of stock
+        {!available && (
+          <span className="absolute left-3 top-3 rounded-sm bg-ink/85 px-2.5 py-1 text-[11px] uppercase tracking-label text-cream">
+            Sold out
           </span>
         )}
-      </Link>
-
-      <div className="p-3 flex flex-col flex-1">
-        <p className="text-[11px] uppercase tracking-wide text-gold-dark mb-1">
-          {product.fabric}
-        </p>
-        <Link href={`/products/${product.sku}`} className="flex-1">
-          <h3 className="font-sans text-sm font-medium text-charcoal line-clamp-2 hover:text-gold-dark transition-colors">
-            {product.name}
-          </h3>
-        </Link>
-        <p className="mt-2 font-serif text-lg font-semibold text-charcoal">
-          {format(product.price)}
-        </p>
-        <button
-          onClick={handleAdd}
-          disabled={!product.in_stock}
-          className="btn-gold mt-3 text-sm w-full"
-        >
-          {product.in_stock ? 'Add to Cart' : 'Sold Out'}
-        </button>
       </div>
-    </div>
+      <div className="mt-4 space-y-1">
+        <p className="eyebrow">{product.fabric}</p>
+        <h3 className="font-serif text-xl leading-snug text-ink group-hover:text-kumkum">{product.title}</h3>
+        <p className="text-[15px] text-ink">
+          {formatAUD(product.priceAud)} <span className="text-xs text-ink-mute">AUD</span>
+        </p>
+      </div>
+    </Link>
   );
 }

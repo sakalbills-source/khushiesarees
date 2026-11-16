@@ -1,103 +1,74 @@
 'use client';
 
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useState,
-  useCallback,
-  ReactNode,
-} from 'react';
-import { CartItem } from '@/lib/types';
+import { createContext, useCallback, useContext, useEffect, useMemo, useState, ReactNode } from 'react';
+import { CatalogProduct, getProductBySku } from '@/lib/catalog';
 
-const STORAGE_KEY = 'ksarees_cart';
-const SESSION_KEY = 'ksarees_session';
+// The bag holds SKUs only. Each saree is a single piece, so quantity is 1.
+// Names and prices are always read from the catalogue (and re-checked on the
+// server at checkout), never from what is stored in the browser.
+const STORAGE_KEY = 'ks_bag_v1';
 
 interface CartContextValue {
-  items: CartItem[];
-  sessionId: string;
+  skus: string[];
+  products: CatalogProduct[];
   count: number;
   subtotal: number;
-  addItem: (item: Omit<CartItem, 'quantity'>, qty?: number) => void;
-  removeItem: (sku: string) => void;
-  updateQty: (sku: string, qty: number) => void;
+  hydrated: boolean;
+  has: (sku: string) => boolean;
+  add: (sku: string) => void;
+  remove: (sku: string) => void;
   clear: () => void;
 }
 
 const CartContext = createContext<CartContextValue | undefined>(undefined);
 
-function genSessionId(): string {
-  return 'sess_' + Math.random().toString(36).slice(2) + Date.now().toString(36);
-}
-
 export function CartProvider({ children }: { children: ReactNode }) {
-  const [items, setItems] = useState<CartItem[]>([]);
-  const [sessionId, setSessionId] = useState<string>('');
+  const [skus, setSkus] = useState<string[]>([]);
   const [hydrated, setHydrated] = useState(false);
 
-  // Hydrate from localStorage on mount.
   useEffect(() => {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) setItems(JSON.parse(raw));
-      let sid = localStorage.getItem(SESSION_KEY);
-      if (!sid) {
-        sid = genSessionId();
-        localStorage.setItem(SESSION_KEY, sid);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) setSkus(parsed.filter((s) => typeof s === 'string' && getProductBySku(s)));
       }
-      setSessionId(sid);
     } catch {
-      // ignore corrupt storage
+      /* storage unavailable */
     }
     setHydrated(true);
   }, []);
 
-  // Persist whenever items change (after hydration).
   useEffect(() => {
     if (!hydrated) return;
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(skus));
     } catch {
-      // ignore quota errors
+      /* storage unavailable */
     }
-  }, [items, hydrated]);
+  }, [skus, hydrated]);
 
-  const addItem = useCallback((item: Omit<CartItem, 'quantity'>, qty = 1) => {
-    setItems((prev) => {
-      const existing = prev.find((i) => i.sku === item.sku);
-      if (existing) {
-        return prev.map((i) =>
-          i.sku === item.sku ? { ...i, quantity: i.quantity + qty } : i,
-        );
-      }
-      return [...prev, { ...item, quantity: qty }];
-    });
-  }, []);
+  const add = useCallback((sku: string) => setSkus((prev) => (prev.includes(sku) ? prev : [...prev, sku])), []);
+  const remove = useCallback((sku: string) => setSkus((prev) => prev.filter((s) => s !== sku)), []);
+  const clear = useCallback(() => setSkus([]), []);
+  const has = useCallback((sku: string) => skus.includes(sku), [skus]);
 
-  const removeItem = useCallback((sku: string) => {
-    setItems((prev) => prev.filter((i) => i.sku !== sku));
-  }, []);
+  const value = useMemo(() => {
+    const products = skus.map((s) => getProductBySku(s)).filter(Boolean) as CatalogProduct[];
+    return {
+      skus,
+      products,
+      count: products.length,
+      subtotal: products.reduce((n, p) => n + p.priceAud, 0),
+      hydrated,
+      has,
+      add,
+      remove,
+      clear,
+    };
+  }, [skus, hydrated, has, add, remove, clear]);
 
-  const updateQty = useCallback((sku: string, qty: number) => {
-    setItems((prev) =>
-      prev
-        .map((i) => (i.sku === sku ? { ...i, quantity: Math.max(1, qty) } : i))
-        .filter((i) => i.quantity > 0),
-    );
-  }, []);
-
-  const clear = useCallback(() => setItems([]), []);
-
-  const count = items.reduce((n, i) => n + i.quantity, 0);
-  const subtotal = items.reduce((n, i) => n + i.price * i.quantity, 0);
-
-  return (
-    <CartContext.Provider
-      value={{ items, sessionId, count, subtotal, addItem, removeItem, updateQty, clear }}
-    >
-      {children}
-    </CartContext.Provider>
-  );
+  return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 }
 
 export function useCart(): CartContextValue {

@@ -2,12 +2,18 @@
 const nextConfig = {
   reactStrictMode: true,
   images: {
-    remotePatterns: [
-      { protocol: 'https', hostname: 'images.unsplash.com' },
-      { protocol: 'https', hostname: 'plus.unsplash.com' },
-      { protocol: 'https', hostname: 'source.unsplash.com' },
-      { protocol: 'https', hostname: 'placehold.co' },
-    ],
+    // Product photos are local files in /public/images/sarees (served as supplied).
+    formats: ['image/avif', 'image/webp'],
+    deviceSizes: [360, 480, 640, 828, 1080, 1280, 1600],
+    minimumCacheTTL: 31536000,
+  },
+  async redirects() {
+    return [
+      { source: '/products', destination: '/sarees', permanent: true },
+      { source: '/products/:path*', destination: '/sarees', permanent: false },
+      { source: '/checkout', destination: '/cart', permanent: false },
+      { source: '/shop', destination: '/sarees', permanent: true },
+    ];
   },
 };
 

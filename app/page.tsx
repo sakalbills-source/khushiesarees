@@ -1,121 +1,158 @@
+import Image from 'next/image';
 import Link from 'next/link';
 import type { Metadata } from 'next';
-import Hero from '@/components/Hero';
-import Newsletter from '@/components/Newsletter';
-import ProductGrid from '@/components/ProductGrid';
-import { getFeaturedByCategory } from '@/lib/products';
-import { Category } from '@/lib/types';
-import { DEFAULT_DESCRIPTION, DEFAULT_OG_IMAGE, DEFAULT_TITLE } from '@/lib/seo';
-import { organizationJsonLd, websiteJsonLd } from '@/lib/structured-data';
+import ProductCard from '@/components/ProductCard';
+import Social from '@/components/Social';
+import JsonLd from '@/components/JsonLd';
+import { PRODUCTS } from '@/lib/catalog';
+import { getStockSafe } from '@/lib/inventory';
+import { formatAUD } from '@/lib/format';
+import { organizationJsonLd } from '@/lib/structured-data';
+import { DEFAULT_DESCRIPTION, DEFAULT_TITLE } from '@/lib/site';
 
-const sections: { category: Category; title: string; subtitle: string }[] = [
-  { category: 'saree', title: 'Sarees', subtitle: 'Silk, Banarasi, Georgette & more' },
-  { category: 'lehenga', title: 'Lehengas', subtitle: 'Bridal & festive showstoppers' },
-  { category: 'suit', title: 'Salwar Suits', subtitle: 'Anarkali, palazzo & sharara sets' },
-  { category: 'kurti', title: 'Kurtis', subtitle: 'Everyday elegance, reimagined' },
-];
-
-export const revalidate = 60;
+export const revalidate = 30;
 
 export const metadata: Metadata = {
-  title: DEFAULT_TITLE,
+  title: { absolute: DEFAULT_TITLE },
   description: DEFAULT_DESCRIPTION,
   alternates: { canonical: '/' },
-  openGraph: {
-    title: DEFAULT_TITLE,
-    description: DEFAULT_DESCRIPTION,
-    url: '/',
-    images: [{ url: DEFAULT_OG_IMAGE, width: 1200, height: 630 }],
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: DEFAULT_TITLE,
-    description: DEFAULT_DESCRIPTION,
-    images: [DEFAULT_OG_IMAGE],
-  },
 };
 
-export default async function HomePage() {
-  const sectionData = await Promise.all(
-    sections.map(async (s) => ({
-      ...s,
-      products: await getFeaturedByCategory(s.category, 8),
-    })),
-  );
+// Only claims the pack supports: real approved photos, fall & hem done on all
+// five, inclusions listed per saree, AUD prices, Stripe card checkout, Brisbane.
+const REASONS = [
+  {
+    title: 'Real photographs',
+    body: 'Every saree is photographed for real, from the full drape to close-up details, so you can see the borders, motifs and finish.',
+  },
+  {
+    title: 'Ready to wear',
+    body: 'Each saree comes with its fall and hem already completed.',
+  },
+  {
+    title: 'Clear inclusions',
+    body: 'Every listing states exactly what is included: blouse piece or stitched blouse, sizing and petticoat.',
+  },
+  {
+    title: 'Simple, secure checkout',
+    body: 'Prices are in Australian dollars and card payments are processed securely by Stripe.',
+  },
+];
 
-  // Only show category sections that actually have products. When the whole
-  // catalogue is empty, render a single clean "Coming soon" block instead of a
-  // wall of empty sections.
-  const populated = sectionData.filter((s) => s.products.length > 0);
-  const catalogueEmpty = populated.length === 0;
+export default async function HomePage() {
+  const stock = await getStockSafe();
+  const isAvail = (sku: string) => (stock[sku]?.available ?? 0) > 0;
+  const hero = PRODUCTS[0];
+  const heroSecond = PRODUCTS[4];
+  const [feature, ...rest] = PRODUCTS;
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        // eslint-disable-next-line react/no-danger
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd()) }}
-      />
-      <script
-        type="application/ld+json"
-        // eslint-disable-next-line react/no-danger
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd()) }}
-      />
-      <Hero />
+      <JsonLd data={organizationJsonLd()} />
 
-      {/* Category quick links */}
-      <section className="container-px py-10">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {sections.map((s) => (
-            <Link
-              key={s.category}
-              href={`/products?category=${s.category}`}
-              className="bg-gray-50 hover:bg-gold/10 border border-gray-100 rounded-sm p-6 text-center transition-colors"
-            >
-              <span className="font-serif text-xl text-charcoal">{s.title}</span>
+      {/* Hero */}
+      <section className="bg-cream-warm">
+        <div className="container-px grid items-center gap-10 py-10 sm:py-14 lg:grid-cols-[1fr_1.1fr] lg:gap-16 lg:py-20">
+          <div className="order-2 lg:order-1">
+            <p className="eyebrow">A saree boutique in Brisbane</p>
+            <h1 className="mt-4 text-[2.6rem] leading-[1.05] sm:text-6xl">
+              Sarees for the moments <em className="text-kumkum">you celebrate</em>
+            </h1>
+            <div className="rule-gold mt-6" />
+            <p className="mt-6 max-w-md text-lg leading-relaxed text-ink-soft">
+              Ajrakh with real mirror work, embroidered georgette, soft art silk and shimmering Fendi fabric,
+              each one photographed in detail.
+            </p>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <Link href="/sarees" className="btn-primary">Shop Sarees</Link>
+              <Link href="/about" className="btn-secondary">Our story</Link>
+            </div>
+          </div>
+          <div className="order-1 grid grid-cols-[1.35fr_1fr] items-end gap-3 sm:gap-4 lg:order-2">
+            <Link href={`/sarees/${hero.slug}`} className="relative block aspect-[3/4] overflow-hidden rounded-sm bg-cream">
+              <Image src={hero.gallery[0].src} alt={hero.gallery[0].alt} fill priority sizes="(min-width:1024px) 32vw, 58vw" className="object-contain" />
             </Link>
-          ))}
+            <Link href={`/sarees/${heroSecond.slug}`} className="relative mb-8 block aspect-[3/4] overflow-hidden rounded-sm bg-cream">
+              <Image src={heroSecond.gallery[0].src} alt={heroSecond.gallery[0].alt} fill priority sizes="(min-width:1024px) 22vw, 40vw" className="object-contain" />
+            </Link>
+          </div>
         </div>
       </section>
 
-      {catalogueEmpty ? (
-        <section className="container-px py-16">
-          <div className="text-center py-16 px-4 border border-dashed border-gray-200 rounded-sm bg-gray-50/50 max-w-2xl mx-auto">
-            <p className="text-gold-dark text-xs uppercase tracking-[0.3em] mb-3">
-              Coming soon
-            </p>
-            <h2 className="font-serif text-3xl text-charcoal mb-3">
-              Our new collection is on its way
-            </h2>
-            <p className="text-gray-500 max-w-md mx-auto">
-              We&apos;re curating something special. Join our list below to be the
-              first to know when the boutique opens.
-            </p>
-          </div>
-        </section>
-      ) : (
-        populated.map((s) => (
-          <section key={s.category} className="container-px py-10">
-            <div className="flex items-end justify-between mb-6">
-              <div>
-                <h2 className="font-serif text-3xl text-charcoal">{s.title}</h2>
-                <p className="text-gray-500 text-sm mt-1">{s.subtitle}</p>
-              </div>
-              <Link
-                href={`/products?category=${s.category}`}
-                className="text-gold-dark text-sm font-medium hover:underline whitespace-nowrap"
-              >
-                View all →
-              </Link>
-            </div>
-            <ProductGrid products={s.products} />
-          </section>
-        ))
-      )}
+      {/* Intro */}
+      <section className="container-px py-16 text-center sm:py-20">
+        <p className="eyebrow">Welcome to Khushie Sarees</p>
+        <p className="mx-auto mt-5 max-w-2xl font-serif text-2xl leading-snug text-ink sm:text-3xl">
+          A small, carefully chosen collection of sarees for festive gatherings, weddings and family celebrations,
+          with every detail described and every inclusion listed.
+        </p>
+      </section>
 
-      {/* Social proof intentionally omitted until real, attributable customer
-          reviews exist. Do not reinstate invented testimonials. */}
-      <Newsletter />
+      {/* Featured sarees */}
+      <section aria-labelledby="featured" className="container-px">
+        <div className="flex items-end justify-between gap-4">
+          <div>
+            <p className="eyebrow">The collection</p>
+            <h2 id="featured" className="mt-2 text-3xl sm:text-4xl">Featured sarees</h2>
+          </div>
+          <Link href="/sarees" className="link-underline hidden text-sm text-kumkum sm:inline">Shop all sarees</Link>
+        </div>
+
+        <div className="mt-10 grid gap-x-4 gap-y-12 sm:gap-x-8 lg:grid-cols-[1.25fr_2fr]">
+          {/* Lead feature */}
+          <div>
+            <ProductCard product={feature} available={isAvail(feature.sku)} sizes="(min-width:1024px) 38vw, 90vw" />
+            <p className="mt-3 text-sm leading-relaxed text-ink-soft">{feature.shortDescription}</p>
+          </div>
+          <div className="grid grid-cols-2 gap-x-4 gap-y-12 sm:gap-x-8">
+            {rest.map((p) => (
+              <ProductCard key={p.sku} product={p} available={isAvail(p.sku)} sizes="(min-width:1024px) 26vw, 45vw" />
+            ))}
+          </div>
+        </div>
+        <div className="mt-12 text-center sm:hidden">
+          <Link href="/sarees" className="btn-secondary">Shop all sarees</Link>
+        </div>
+      </section>
+
+      {/* Reasons to shop */}
+      <section aria-labelledby="why" className="mt-24 bg-cream-warm">
+        <div className="container-px py-16 sm:py-20">
+          <p className="eyebrow text-center">Why shop with us</p>
+          <h2 id="why" className="mt-2 text-center text-3xl sm:text-4xl">Thoughtful from the first look</h2>
+          <ul className="mt-12 grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
+            {REASONS.map((r) => (
+              <li key={r.title} className="text-center">
+                <span aria-hidden="true" className="mx-auto block h-2 w-2 rotate-45 bg-zari-light" />
+                <h3 className="mt-4 text-2xl">{r.title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-ink-soft">{r.body}</p>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+
+      {/* Price strip: a quiet, honest summary */}
+      <section className="container-px py-16 text-center">
+        <p className="text-ink-soft">
+          Sarees from {formatAUD(Math.min(...PRODUCTS.map((p) => p.priceAud)))} AUD.{' '}
+          <Link href="/sarees" className="link-underline text-kumkum">Browse the collection</Link>
+        </p>
+      </section>
+
+      {/* Social */}
+      <section aria-labelledby="follow" className="container-px">
+        <div className="rounded-sm border border-zari/25 px-6 py-12 text-center">
+          <p className="eyebrow">Follow along</p>
+          <h2 id="follow" className="mt-2 text-3xl">See our sarees in motion</h2>
+          <p className="mx-auto mt-3 max-w-md text-ink-soft">
+            Drapes, details and new arrivals on Instagram and TikTok.
+          </p>
+          <div className="mt-6 flex justify-center">
+            <Social />
+          </div>
+        </div>
+      </section>
     </>
   );
 }

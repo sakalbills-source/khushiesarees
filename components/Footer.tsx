@@ -1,76 +1,61 @@
 import Link from 'next/link';
-import { CATEGORIES } from '@/lib/types';
-import { SHIPPING_REGIONS } from '@/lib/shipping';
-import { WHATSAPP_LINK } from '@/lib/contact';
-import RatesNote from './RatesNote';
+import { PleatK } from './Logo';
+import Social from './Social';
+
+const SHOP = [
+  { href: '/sarees', label: 'Shop All Sarees' },
+  { href: '/about', label: 'About' },
+  { href: '/faqs', label: 'FAQs' },
+  { href: '/contact', label: 'Contact' },
+];
+const HELP = [
+  { href: '/shipping', label: 'Shipping & Delivery' },
+  { href: '/returns', label: 'Returns & Refunds' },
+  { href: '/privacy', label: 'Privacy Policy' },
+  { href: '/terms', label: 'Terms' },
+];
 
 export default function Footer() {
   return (
-    <footer className="bg-charcoal text-gray-300 mt-16">
-      <div className="container-px py-12 grid grid-cols-2 md:grid-cols-4 gap-8 text-sm">
+    <footer className="mt-24 bg-kumkum-deep text-cream">
+      <div className="container-px grid gap-10 py-14 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr]">
         <div>
-          <h4 className="text-gold font-serif text-xl mb-3">KSarees</h4>
-          <p className="text-gray-400 leading-relaxed">
-            Premium Indian ethnic wear, shipped worldwide. Handpicked sarees,
-            lehengas & more for every celebration.
+          <div className="flex items-center gap-3">
+            <span className="rounded-full bg-cream p-1.5"><PleatK className="h-8 w-8" /></span>
+            <span className="font-serif text-2xl">Khushie Sarees</span>
+          </div>
+          <p className="mt-4 max-w-xs text-sm leading-relaxed text-cream/80">
+            A saree boutique in Brisbane, Australia.
           </p>
+          <div className="mt-6">
+            <Social tone="dark" />
+          </div>
         </div>
-
-        <div>
-          <h5 className="font-semibold text-white mb-3">Shop</h5>
-          <ul className="space-y-2">
-            {CATEGORIES.map((c) => (
-              <li key={c.value}>
-                <Link
-                  href={`/products?category=${c.value}`}
-                  className="hover:text-gold transition-colors"
-                >
-                  {c.label}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        <div>
-          <h5 className="font-semibold text-white mb-3">We Ship To</h5>
-          <ul className="space-y-2 text-gray-400">
-            {SHIPPING_REGIONS.map((r) => (
-              <li key={r.code}>{r.label}</li>
-            ))}
-          </ul>
-        </div>
-
-        <div>
-          <h5 className="font-semibold text-white mb-3">Help</h5>
-          <ul className="space-y-2">
-            {WHATSAPP_LINK && (
-              <li>
-                <a
-                  href={WHATSAPP_LINK}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:text-gold"
-                >
-                  WhatsApp Support
-                </a>
-              </li>
-            )}
-            <li>
-              <Link href="/cart" className="hover:text-gold">
-                Your Cart
-              </Link>
-            </li>
-          </ul>
-        </div>
+        <FooterList title="Shop" items={SHOP} />
+        <FooterList title="Help" items={HELP} />
       </div>
-
-      <div className="border-t border-white/10 py-4 text-center text-xs text-gray-500 space-y-1.5">
-        <RatesNote />
-        <p>
-          © {new Date().getFullYear()} KSarees. All rights reserved. Built with Next.js.
+      <div className="border-t border-cream/15">
+        <p className="container-px py-5 text-xs text-cream/70">
+          © {new Date().getFullYear()} Khushie Sarees · Prices in Australian dollars (AUD) · Secure payment by Stripe
         </p>
       </div>
     </footer>
+  );
+}
+
+function FooterList({ title, items }: { title: string; items: { href: string; label: string }[] }) {
+  return (
+    <div>
+      <h2 className="font-sans text-[11px] font-medium uppercase tracking-label text-zari-light">{title}</h2>
+      <ul className="mt-4 space-y-1">
+        {items.map((i) => (
+          <li key={i.href}>
+            <Link href={i.href} className="inline-block py-1.5 text-sm text-cream/90 hover:text-cream hover:underline underline-offset-4">
+              {i.label}
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }

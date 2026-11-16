@@ -2,36 +2,41 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --font-serif: 'Playfair Display', Georgia, serif;
-  --font-sans: 'Inter', system-ui, sans-serif;
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
 }
 
 body {
-  @apply bg-white text-charcoal antialiased;
+  @apply bg-cream text-ink antialiased;
   font-family: var(--font-sans);
 }
 
-h1, h2, h3, h4 {
-  font-family: var(--font-serif);
-}
+h1, h2, h3, h4 { font-family: var(--font-serif); font-weight: 500; }
+
+:focus-visible { outline: 2px solid #A6132B; outline-offset: 3px; }
 
 @layer components {
-  .btn-gold {
-    @apply inline-flex items-center justify-center bg-gold text-charcoal font-semibold
-           px-5 py-2.5 rounded-sm transition-colors hover:bg-gold-dark hover:text-white
-           disabled:opacity-50 disabled:cursor-not-allowed;
+  .container-px { @apply max-w-6xl mx-auto px-4 sm:px-6 lg:px-8; }
+  .eyebrow { @apply text-[11px] uppercase tracking-label text-zari font-medium; }
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 bg-kumkum text-cream text-sm font-medium
+           tracking-wide px-7 py-3.5 rounded-sm transition-colors hover:bg-kumkum-deep
+           disabled:opacity-50 disabled:cursor-not-allowed min-h-[48px];
   }
-  .btn-outline {
-    @apply inline-flex items-center justify-center border border-gold text-charcoal
-           font-semibold px-5 py-2.5 rounded-sm transition-colors hover:bg-gold
-           hover:text-charcoal;
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 border border-kumkum/70 text-kumkum text-sm
+           font-medium tracking-wide px-7 py-3.5 rounded-sm transition-colors hover:bg-kumkum hover:text-cream
+           min-h-[48px];
   }
-  .input {
-    @apply w-full border border-gray-300 rounded-sm px-3 py-2 text-sm
-           focus:outline-none focus:ring-2 focus:ring-gold focus:border-transparent;
-  }
-  .container-px {
-    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
-  }
+  .link-underline { @apply underline decoration-zari/60 underline-offset-4 hover:decoration-kumkum; }
+  .rule-gold { @apply h-px w-12 bg-zari/70; }
+  .prose-ks p { @apply text-ink-soft leading-relaxed mb-4; }
+  .prose-ks h2 { @apply text-2xl text-ink mt-10 mb-3; }
+  .prose-ks ul { @apply list-disc pl-5 text-ink-soft space-y-1.5 mb-4; }
+  /* admin screen (unchanged look) */
+  .btn-gold { @apply inline-flex items-center justify-center bg-gold text-charcoal font-semibold px-5 py-2.5 rounded-sm hover:bg-gold-dark hover:text-white disabled:opacity-50; }
+  .btn-outline { @apply inline-flex items-center justify-center border border-gold text-charcoal font-semibold px-5 py-2.5 rounded-sm hover:bg-gold; }
+  .input { @apply w-full border border-gray-300 rounded-sm px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gold; }
 }

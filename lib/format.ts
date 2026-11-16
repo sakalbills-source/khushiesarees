@@ -1,11 +1,8 @@
-import { formatMoney } from './currency';
-
-/**
- * Format an amount in the base currency (AUD). Use this only where prices are
- * authored/managed in the base currency (e.g. the admin panel). Customer-facing
- * surfaces should use the currency context (`useCurrency().format`) so prices
- * render in the shopper's selected currency.
- */
+/** Prices are in Australian dollars, shown as "A$80". */
 export function formatAUD(amount: number): string {
-  return formatMoney(amount, 'AUD');
+  const whole = Number.isInteger(amount);
+  return `A$${amount.toLocaleString('en-AU', {
+    minimumFractionDigits: whole ? 0 : 2,
+    maximumFractionDigits: 2,
+  })}`;
 }
